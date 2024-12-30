@@ -13,21 +13,17 @@
   "scripts": {
     "add-lint-exclusions": "php civictheme_starter_kit/scripts/add_phpcs_exclusions.php dist,storybook-static,lib/uikit",
     "build": "npm run dist && export STORYBOOK_FULL=1 && npm run build-storybook -- --quiet && npm run add-lint-exclusions",
-    "build:new": "node build.js base build styles styles_editor styles_admin styles_layout styles_variables js assets",
-    "build:watch:new": "node build.js base build watch styles styles_editor styles_admin styles_layout styles_variables js assets",
+    "build:new": "node build.js",
+    "build:watch:new": "node build.js",
     "build-storybook": "export NODE_OPTIONS=--openssl-legacy-provider && build-storybook -s .storybook/static",
-    "dist": "export NODE_OPTIONS=--openssl-legacy-provider && webpack --config ./webpack/webpack.prod.js",
-    "dist:dev": "export NODE_OPTIONS=--openssl-legacy-provider && webpack --config ./webpack/webpack.dev.js",
+    "dist": "npm run build:new",
+    "dist:dev": "npm run build:new",
     "lint": "eslint ./components ./.storybook ./webpack && stylelint '{components,assets/sass}/**/*.scss'",
     "lint-fix": "eslint ./components ./.storybook ./webpack --fix && stylelint 'components/**/*.scss' --fix",
-    "postinstall": "patch-package && npm run uikit-install && npm run add-lint-exclusions",
-    "reset": "rm -rf node_modules > /dev/null; rm -rf lib/uikit > /dev/null",
+    "postinstall": "patch-package",
+    "reset": "rm -rf node_modules > /dev/null > /dev/null",
     "storybook": "export NODE_OPTIONS=--openssl-legacy-provider && start-storybook -s .storybook/static",
-    "storybook-full": "export NODE_OPTIONS=--openssl-legacy-provider && export STORYBOOK_FULL=1 && start-storybook -s .storybook/static",
-    "uikit-install": "rm -Rf lib/uikit > /dev/null 2>&1 && mkdir -p lib/uikit && cp -R node_modules/@civictheme/uikit lib && rm -Rf lib/uikit/dist lib/uikit/storybook-static > /dev/null 2>&1"
-  },
-  "dependencies": {
-    "@civictheme/uikit": "github:civictheme/uikit#main"
+    "storybook-full": "export NODE_OPTIONS=--openssl-legacy-provider && export STORYBOOK_FULL=1 && start-storybook -s .storybook/static"
   },
   "devDependencies": {
     "@alexskrypnyk/scss-variables-extractor": "^0.1.1",
@@ -56,6 +52,7 @@
     "eslint-config-airbnb": "^19.0.4",
     "eslint-plugin-import-newlines": "^1.4.0",
     "file-loader": "^6.2.0",
+    "glob": "^11.0.0",
     "glob-gitignore": "^1.0.14",
     "html-webpack-plugin": "^4.5.2",
     "lorem-ipsum": "^2.0.8",
@@ -79,5 +76,8 @@
     "webpack": "^4.47.0",
     "webpack-cli": "^4.10.0",
     "webpack-merge": "^5.10.0"
+  },
+  "dependencies": {
+    "@popperjs/core": "^2.11.8"
   }
 }

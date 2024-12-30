@@ -7,8 +7,8 @@ import { setupTwig } from './setupTwig';
 
 // Add support for running scripts wrapped in Drupal.behaviours.
 import './drupal_behaviors';
-import { decoratorStoryLayout } from '../components/00-base/storybook/storybook.layout.utils';
-import { decoratorDocs } from '../components/00-base/storybook/storybook.docs.utils';
+import { decoratorStoryLayout } from '../components_combined/00-base/storybook/storybook.layout.utils';
+import { decoratorDocs } from '../components_combined/00-base/storybook/storybook.docs.utils';
 
 // Call attaching of behaviours.
 addDecorator((storyFn) => {

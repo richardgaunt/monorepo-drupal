@@ -26,7 +26,7 @@ Notes:
 
 const fs = require('fs')
 const path = require('path')
-const { globSync } = require('node:fs')
+const { globSync } = require('glob')
 const { execSync } = require('child_process')
 const sass = require('sass')
 
@@ -110,7 +110,7 @@ if (flags.length <= 2 && buildWatchFlagCount <= 2) {
 const PATH = __dirname
 
 const THEME_NAME              = PATH.split('/').reverse()[0]
-const DIR_CIVICTHEME          = fullPath('../../contrib/civictheme/')
+const DIR_CIVICTHEME          = fullPath('../../contrib/civictheme_base/')
 const DIR_COMPONENTS_IN       = fullPath('./components/')
 const DIR_COMPONENTS_OUT      = fullPath('./components_combined/')
 const DIR_UIKIT_COMPONENTS_IN = `${DIR_CIVICTHEME}/lib/uikit/components/`

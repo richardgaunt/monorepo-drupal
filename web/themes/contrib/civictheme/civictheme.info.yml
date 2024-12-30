@@ -1,12 +1,8 @@
 name: CivicTheme
 type: theme
-base theme: false
+base theme: civictheme_base
 description: CivicTheme is a Drupal component-based theme.
 core_version_requirement: ^10 || ^11
-
-libraries:
-  - 'civictheme/global'
-  - 'civictheme/css-variables'
 
 dependencies:
   - components:components
@@ -68,41 +64,6 @@ regions:
 features:
   - favicon
 
-components:
-  namespaces:
-    base:
-      - components/00-base
-    atoms:
-      - components/01-atoms
-    molecules:
-      - components/02-molecules
-    organisms:
-      - components/03-organisms
-    templates:
-      - components/04-templates
-    ct-base:
-      - components/00-base
-    ct-atoms:
-      - components/01-atoms
-    ct-molecules:
-      - components/02-molecules
-    ct-organisms:
-      - components/03-organisms
-    ct-templates:
-      - components/04-templates
-
-ckeditor5-stylesheets:
-  - dist/civictheme.editor.css
-  - dist/civictheme.variables.css
-  # Using colors from the Color Selector is not supported until the issue
-  # below is resolved.
-  # @see https://www.drupal.org/project/drupal/issues/3406959
-  # - /sites/default/files/css-variables.civictheme.css
-#;< DEVELOPMENT
-# Configuration shipped with this theme.
-# Update the list of the configuration below and run `drush cde civictheme`.
-# Do not add an empty line before this comment block or the downstream code
-# linting will fail on extra blank line.
 config_devel:
   install:
     - block.block.civictheme_content

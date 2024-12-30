@@ -8,19 +8,17 @@
   },
   "scripts": {
     "add-lint-exclusions": "php scripts/add_phpcs_exclusions.php dist,storybook-static",
-    "build": "npm run dist && export STORYBOOK_FULL=1 && npm run build-storybook -- --quiet && npm run add-lint-exclusions",
+    "build": "npm run dist && export STORYBOOK_FULL=1 && npm run build-storybook -- --quiet",
     "build:new": "node build.js",
     "build:watch:new": "node build.js build watch",
-    "build-storybook": "export NODE_OPTIONS=--openssl-legacy-provider && npm run gulp:build && build-storybook -s .storybook/static",
-    "dist": "export NODE_OPTIONS=--openssl-legacy-provider && npm run gulp:build && webpack --config ./webpack/webpack.prod.js",
-    "dist:dev": "export NODE_OPTIONS=--openssl-legacy-provider && npm run gulp:build && webpack --config ./webpack/webpack.dev.js",
-    "gulp:build": "gulp",
-    "gulp:watch": "gulp watch",
+    "build-storybook": "export NODE_OPTIONS=--openssl-legacy-provider && npm run build:new && build-storybook -s .storybook/static",
+    "dist": "npm run build:new",
+    "dist:dev": "npm run build:new",
     "lint": "eslint --no-error-on-unmatched-pattern ./components ./.storybook ./webpack && stylelint 'components/**/*.scss'",
     "lint-fix": "eslint ./components ./.storybook ./webpack --fix && stylelint 'components/**/*.scss' --fix",
     "postinstall": "patch-package",
-    "storybook": "export NODE_OPTIONS=--openssl-legacy-provider && npm run gulp:build && concurrently --raw=true \"npm run gulp:watch\" \"start-storybook -s .storybook/static\"\n",
-    "storybook-full": "export NODE_OPTIONS=--openssl-legacy-provider && export STORYBOOK_FULL=1 && npm run gulp:build && concurrently --raw=true \"npm run gulp:watch\" \"start-storybook -s .storybook/static\"\n"
+    "storybook": "export NODE_OPTIONS=--openssl-legacy-provider && npm run build:new && concurrently --raw=true \"npm run build:watch:new\" \"start-storybook -s .storybook/static\"\n",
+    "storybook-full": "export NODE_OPTIONS=--openssl-legacy-provider && export STORYBOOK_FULL=1 && npm run build:new && concurrently --raw=true \"npm run build:watch:new\" \"start-storybook -s .storybook/static\"\n"
   },
   "devDependencies": {
     "@alexskrypnyk/scss-variables-extractor": "^0.1.1",
@@ -51,6 +49,7 @@
     "eslint-config-airbnb": "^18.2.1",
     "eslint-plugin-import-newlines": "^1.4.0",
     "file-loader": "^6.2.0",
+    "glob": "^11.0.0",
     "glob-gitignore": "^1.0.14",
     "gulp": "^4.0.2",
     "gulp-flatmap": "^1.0.2",

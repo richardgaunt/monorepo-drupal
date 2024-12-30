@@ -16,8 +16,6 @@ module.exports = {
       main: [],
       variables: [],
       editor: [],
-      layout: [],
-      admin: [],
     };
 
     // Scan for all JS.
@@ -38,14 +36,8 @@ module.exports = {
     // Add explicitly editor.scss
     entries.editor.push(path.resolve(__dirname, 'editor_css.js'));
 
-    // Add explicitly layout.scss
-    entries.layout.push(path.resolve(__dirname, 'layout_css.js'));
-
-    // Add explicitly admin.scss
-    entries.admin.push(path.resolve(__dirname, 'admin_css.js'));
-
     return entries;
-  }(path.resolve(__dirname, '../components/**/!(*.stories|*.component|*.min|*.test|*.script|*.utils).js'))),
+  }(path.resolve(__dirname, '../components_combined/**/!(*.stories|*.component|*.min|*.test|*.script|*.utils).js'))),
   optimization: {
     splitChunks: {
       cacheGroups: {
@@ -63,16 +55,6 @@ module.exports = {
           test: 'css/mini-extract',
           name: 'editor',
           chunks: (chunk) => (chunk.name === 'editor'),
-        },
-        layout: {
-          test: 'css/mini-extract',
-          name: 'layout',
-          chunks: (chunk) => (chunk.name === 'layout'),
-        },
-        admin: {
-          test: 'css/mini-extract',
-          name: 'admin',
-          chunks: (chunk) => (chunk.name === 'admin'),
         },
       },
     },
@@ -93,10 +75,6 @@ module.exports = {
         '../dist/civictheme-variables.js.map',
         '../dist/civictheme-editor.js',
         '../dist/civictheme-editor.js.map',
-        '../dist/civictheme-layout.js',
-        '../dist/civictheme-layout.js.map',
-        '../dist/civictheme-admin.js',
-        '../dist/civictheme-admin.js.map',
       ],
     }),
   ],
@@ -156,7 +134,7 @@ module.exports = {
       },
       // Wrap JS into Drupal.behaviours.
       {
-        test: /components\/[^/]+\/(?!.*\.(stories|component|utils)\.js$).*\.js$/,
+        test: /components_combined\/[^/]+\/(?!.*\.(stories|component|utils)\.js$).*\.js$/,
         exclude: /(node_modules|webpack|themejs\.js|css\.js)/,
         use: [{
           loader: 'babel-loader',
@@ -175,11 +153,11 @@ module.exports = {
   },
   resolve: {
     alias: {
-      '@base': path.resolve(__dirname, '../components/00-base'),
-      '@atoms': path.resolve(__dirname, '../components/01-atoms'),
-      '@molecules': path.resolve(__dirname, '../components/02-molecules'),
-      '@organisms': path.resolve(__dirname, '../components/03-organisms'),
-      '@templates': path.resolve(__dirname, '../components/04-templates'),
+      '@base': path.resolve(__dirname, '../components_combined/00-base'),
+      '@atoms': path.resolve(__dirname, '../components_combined/01-atoms'),
+      '@molecules': path.resolve(__dirname, '../components_combined/02-molecules'),
+      '@organisms': path.resolve(__dirname, '../components_combined/03-organisms'),
+      '@templates': path.resolve(__dirname, '../components_combined/04-templates'),
     },
   },
   stats: {

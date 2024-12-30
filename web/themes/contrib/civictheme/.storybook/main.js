@@ -10,9 +10,9 @@ const { merge } = require('webpack-merge');
 const webpack = require('webpack');
 const custom = require('../webpack/webpack.prod');
 const scssVariables = require('./importer.scss_variables');
-const iconUtils = require('../components/00-base/icon/icon.utils');
-const backgroundUtils = require('../components/00-base/background/background.utils');
-const logoUtils = require('../components/02-molecules/logo/logo.utils');
+const iconUtils = require('../components_combined/00-base/icon/icon.utils');
+const backgroundUtils = require('../components_combined/00-base/background/background.utils');
+const logoUtils = require('../components_combined/02-molecules/logo/logo.utils');
 const addonConfig = require('./addon-config').default();
 
 const customPlugin = new webpack.DefinePlugin({
@@ -24,7 +24,7 @@ const customPlugin = new webpack.DefinePlugin({
 
 module.exports = {
   stories: [
-    '../components/**/*.stories.js',
+    '../components_combined/**/*.stories.js',
   ],
   addons: addonConfig,
   webpackFinal: async (config) => {
