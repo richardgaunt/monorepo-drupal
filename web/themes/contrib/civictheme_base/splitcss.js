@@ -30,10 +30,10 @@ const baseResult = compileString(baseData, { loadPaths: [fullComponentDir] });
 fs.writeFileSync(`${baseOutDir}/base.css`, cssHeader + baseResult.css);
 
 // Get component file paths.
-const atoms = globSync(`01-atoms/**/*.scss`, { cwd: componentDir });
-const molecules = globSync(`02-molecules/**/*.scss`, { cwd: componentDir });
-const organisms = globSync(`03-organisms/**/*.scss`, { cwd: componentDir });
-const templates = globSync(`04-templates/**/*.scss`, { cwd: componentDir });
+const atoms = globSync(`01-atoms/**/*.component.yml`, { cwd: componentDir });
+const molecules = globSync(`02-molecules/**/*.component.yml`, { cwd: componentDir });
+const organisms = globSync(`03-organisms/**/*.component.yml`, { cwd: componentDir });
+const templates = globSync(`04-templates/**/*.component.yml`, { cwd: componentDir });
 
 const fileList = [
   ...atoms,
@@ -43,6 +43,7 @@ const fileList = [
 ];
 
 fileList.forEach(filePath => {
+  filePath = filePath.replace(/\.yml$/, '.scss');
   const separator = filePath.lastIndexOf('/') + 1;
   const styleDir = filePath.substring(0, separator);
   const styleName = filePath.substring(separator, filePath.lastIndexOf('.'));

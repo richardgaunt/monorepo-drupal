@@ -5,4 +5,13 @@
  *
  */
 #}
-{% include '@organisms/promo/promo.twig' %}
+{% include 'civictheme_base:promo' with {
+  title: title,
+  content: content,
+  is_contained: is_contained,
+  link: link,
+  theme: theme,
+  vertical_spacing: vertical_spacing,
+  with_background: with_background,
+  modifier_class: modifier_class
+} only %}
