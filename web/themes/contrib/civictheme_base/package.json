@@ -22,7 +22,8 @@
     "postinstall": "npm run uikit-install && npm run add-lint-exclusions",
     "reset": "rm -rf node_modules > /dev/null; rm -rf lib/uikit > /dev/null",
     "storybook": "storybook dev -p 6006",
-    "uikit-install": "rm -Rf lib/uikit > /dev/null 2>&1 && mkdir -p lib/uikit && cp -R node_modules/@civictheme/uikit lib && rm -Rf lib/uikit/dist lib/uikit/storybook-static > /dev/null 2>&1"
+    "uikit-install": "rm -Rf lib/uikit > /dev/null 2>&1 && mkdir -p lib/uikit && cp -R node_modules/@civictheme/uikit lib && rm -Rf lib/uikit/dist lib/uikit/storybook-static > /dev/null 2>&1",
+    "splitcss": "node splitcss.js"
   },
   "dependencies": {
     "@civictheme/uikit": "github:civictheme/uikit#feature/CIVIC-1947-storybook-upgrade"
