@@ -102,7 +102,7 @@ COPY . /app
 # Compile front-end assets. Running this after copying all files as we need
 # sources to compile assets.
 # Install NodeJS dependencies.
-RUN cd /app/web/themes/contrib/civictheme_base && npm run build:new
+RUN cd /app/web/themes/contrib/civictheme_base && npm run dist
 
 # Create sub-theme.
 RUN cd /app/web/themes/contrib/civictheme \
@@ -111,4 +111,4 @@ RUN cd /app/web/themes/contrib/civictheme \
 
 # Compile sub-theme assets.
 RUN npm --prefix web/themes/custom/civictheme_demo install --no-audit --no-progress --unsafe-perm \
-  && cd /app/web/themes/custom/civictheme_demo && npm run build:new
+  && cd /app/web/themes/custom/civictheme_demo && npm run dist

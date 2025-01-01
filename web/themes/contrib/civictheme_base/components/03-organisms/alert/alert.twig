@@ -54,7 +54,7 @@
           {{ description|raw }}
           {% include "civictheme_base:button" with {
             kind: 'button',
-            theme: theme,
+            theme: theme|default('light'),
             type: 'tertiary',
             modifier_class: 'ct-alert__dismiss-button',
             text: '',

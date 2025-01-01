@@ -70,3 +70,5 @@ ckeditor5-stylesheets:
   # below is resolved.
   # @see https://www.drupal.org/project/drupal/issues/3406959
   # - /sites/default/files/css-variables.civictheme.css
+
+enforce_prop_schemas: true

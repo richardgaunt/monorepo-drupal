@@ -8,10 +8,10 @@
 {% include 'civictheme_base:promo' with {
   title: title,
   content: content,
-  is_contained: is_contained,
+  is_contained: is_contained|default(false),
   link: link,
   theme: theme,
   vertical_spacing: vertical_spacing,
   with_background: with_background,
-  modifier_class: modifier_class
+  modifier_class: modifier_class|default('')
 } only %}
