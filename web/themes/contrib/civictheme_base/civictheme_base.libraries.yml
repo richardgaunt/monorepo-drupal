@@ -1,6 +1,7 @@
 global:
   css:
     theme:
+      dist/base.css: {}
       dist/civictheme.css: {}
   js:
     dist/civictheme.js: {}

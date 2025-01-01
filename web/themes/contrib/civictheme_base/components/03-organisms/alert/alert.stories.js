@@ -1,5 +1,8 @@
 // phpcs:ignoreFile
 import Component from './alert.twig';
+import './alert.css';
+// eslint-disable-next-line import/extensions
+import './alert.js';
 
 const meta = {
   title: 'Organisms/Alert',

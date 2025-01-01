@@ -29,11 +29,11 @@ import path from 'path'
 import { globSync } from 'glob'
 import { execSync, spawn } from 'child_process'
 import * as sass from 'sass'
-
 import scssVariables from './.storybook/importer.scss_variables.js'
 import iconUtils from './components/00-base/icon/icon.utils.js'
 import backgroundUtils from './components/00-base/background/background.utils.js'
 import logoUtils from './components/02-molecules/logo/logo.utils.js'
+import { removeComponentSassImports, generateBaseStyles, generateComponentCssFiles, getSingleDirectoryComponents } from "./splitcss.js";
 
 // ----------------------------------------------------------------------------- UTILITIES
 
@@ -135,8 +135,9 @@ const DIR_UIKIT_COPY_OUT      = fullPath('./.components-civictheme/')
 const DIR_OUT                 = fullPath('./dist/')
 const DIR_ASSETS_IN           = fullPath('./assets/')
 const DIR_ASSETS_OUT          = fullPath('./dist/assets/')
+const DIR_SDC_COMPONENTS      = fullPath('./components/')
 
-const COMPONENT_DIR           = config.base || config.storybook ? DIR_COMPONENTS_IN : DIR_COMPONENTS_OUT
+const COMPONENT_DIR                  = config.base || config.storybook ? DIR_COMPONENTS_IN : DIR_COMPONENTS_OUT
 const STYLE_NAME              = config.base || config.storybook ? 'civictheme' : 'styles'
 const SCRIPT_NAME             = config.base || config.storybook ? 'civictheme' : 'scripts'
 
@@ -182,7 +183,7 @@ function build() {
 
   // --------------------------------------------------------------------------- STYLES
   if (config.styles) {
-    const stylecss = [
+    let stylecss = [
       VAR_CT_ASSETS_DIRECTORY,
       loadStyle(STYLE_FILE_IN, COMPONENT_DIR),
       config.styles_variables ? getStyleImport(STYLE_VARIABLE_FILE_IN, COMPONENT_DIR) : '',
@@ -195,10 +196,16 @@ function build() {
         loadStyle(STYLE_STORIES_FILE_IN, COMPONENT_DIR)
       ].join('\n') : '',
     ].join('\n')
-
+    stylecss = removeComponentSassImports(stylecss, COMPONENT_DIR);
     const compiled = sass.compileString(stylecss, { loadPaths: [COMPONENT_DIR, PATH] })
     const compiledImportAtTop = compiled.css.split('\n').sort(a => a.indexOf('@import') === 0 ? -1 : 0).join('\n')
     fs.writeFileSync(STYLE_FILE_OUT, compiledImportAtTop, 'utf-8')
+    console.log(`Updated theme styles: ${STYLE_FILE_OUT}`);
+    // @todo implement splitcss functionality.
+
+    generateBaseStyles(config.base, DIR_OUT);
+    generateComponentCssFiles(config.base);
+
     console.log(`Saved: Component styles`)
   }
 
@@ -251,7 +258,12 @@ function build() {
     })
 
     // Civictheme component imports.
+    const singleDirectoryComponents = getSingleDirectoryComponents(DIR_COMPONENTS_IN);
     globSync(JS_CIVIC_IMPORTS).forEach(filename => {
+      const componentDirectory = path.dirname(filename).replace(`${DIR_COMPONENTS_IN}/`, '');
+      if (singleDirectoryComponents.includes(componentDirectory)) {
+        return;
+      }
       const name = `${THEME_NAME}_${filename.split('/').reverse()[0].replace('.js', '').replace(/-/g, '_')}`
       const body = fs.readFileSync(filename, 'utf-8')
       let outBody = ''

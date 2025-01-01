@@ -126,3 +126,20 @@ CivicThemeButton.prototype.findButton = function (el) {
 document.querySelectorAll('.ct-button').forEach((el) => {
   new CivicThemeButton(el);
 });
+
+// @todo seems like we need a utility to register components with a central mutation observer.
+// Set up a MutationObserver to monitor changes in the DOM
+const observer = new MutationObserver((mutationsList) => {
+  mutationsList.forEach((mutation) => {
+    // Check if new nodes are added
+    mutation.addedNodes.forEach((node) => {
+      // Ensure the added node is an element and check the attribute
+      if (node.nodeType === Node.ELEMENT_NODE && node.matches('.ct-button')) {
+        new CivicThemeButton(node);
+      }
+    });
+  });
+});
+
+// Start observing document.body for child list changes (and optionally subtree).
+observer.observe(document.body, { childList: true, subtree: true });

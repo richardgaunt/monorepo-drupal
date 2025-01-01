@@ -1,67 +1,142 @@
 import fs from 'fs';
+import { dirname } from 'path';
 import { globSync } from 'glob';
-import {compileString} from 'sass';
+import { compileString } from 'sass';
 
-// Args - allow subtheme generation from this file.
-const isSubtheme = process.argv?.[2] === '--subtheme';
-
-// Variables.
-const componentDir = './components/';
-const fullComponentDir = isSubtheme ? './components_combined/' : componentDir;
-const baseOutDir = './dist/components';
+// Constants.
 const cssHeader = '/**\n * This file was automatically generated. Please run `npm run dist` to update.\n */\n\n';
-const cssFooter = '\nimg \{\n  display: block;\n  max-width: 100%;\n  height: auto;\n\}\n\n';
 
-// Get Mixin file paths.
-const mixins = globSync(`00-base/mixins/**/*.scss`, { cwd: fullComponentDir });
+/**
+ * Gets the component directory.
+ *
+ * @param {boolean} isBaseTheme - whether the theme is a base theme.
+ *
+ * @return {string} - directory path for components.
+ */
+export function getComponentDirectory(isBaseTheme) {
+  return isBaseTheme ? './components/' : './components_combined/';
+}
 
-// Get Base style file paths (ignore mixins, reset, variables, and stories).
-const base = globSync(`00-base/!(mixins)/!(*.stories|variables|_variables.*|reset).scss`, { cwd: fullComponentDir });
+/**
+ * Generates base CSS styles by combining mixins and base SCSS files into a single compiled CSS file.
+ *
+ * @param {boolean} isBaseTheme - Determines whether the base theme directory should be used.
+ * @param {string} baseOutDir - The output directory where the generated base.css file will be saved.
+ * @return {void}
+ */
+export function generateBaseStyles(isBaseTheme, baseOutDir) {
+  const componentDirectory = getComponentDirectory(isBaseTheme);
+  const mixins = globSync('00-base/mixins/**/*.scss', { cwd: componentDirectory });
+  // Get Base style file paths (ignore mixins, reset, variables, and stories).
+  const base = globSync('00-base/!(mixins)/!(*.stories|variables|_variables.*|reset).scss', { cwd: componentDirectory });
 
-// Generate the base.css file.
-const baseData = `
+  // Generate the base.css file.
+  const baseData = `
   @import '00-base/variables';
   ${
-    [...mixins, ...base].map(path => `@import '${path}';`).join('\n')
+    [...mixins, ...base].map((path) => `@import '${path}';`).join('\n')
   }
   @import 'style.css_variables';
 `;
-const baseResult = compileString(baseData, { loadPaths: [fullComponentDir] });
-fs.writeFileSync(`${baseOutDir}/base.css`, cssHeader + baseResult.css);
+  const baseResult = compileString(baseData, { loadPaths: [componentDirectory] });
+  const baseStylesFile = `${baseOutDir}/base.css`;
+  fs.writeFileSync(baseStylesFile, cssHeader + baseResult.css);
+  console.log(`Updating base styles: ${baseStylesFile}`);
+}
 
-// Get component file paths.
-const atoms = globSync(`01-atoms/**/*.component.yml`, { cwd: componentDir });
-const molecules = globSync(`02-molecules/**/*.component.yml`, { cwd: componentDir });
-const organisms = globSync(`03-organisms/**/*.component.yml`, { cwd: componentDir });
-const templates = globSync(`04-templates/**/*.component.yml`, { cwd: componentDir });
+// Get component directories.
+export function getSingleDirectoryComponents(baseComponentDirectory) {
+  const atoms = globSync('01-atoms/**/*.component.yml', { cwd: baseComponentDirectory });
+  const molecules = globSync('02-molecules/**/*.component.yml', { cwd: baseComponentDirectory });
+  const organisms = globSync('03-organisms/**/*.component.yml', { cwd: baseComponentDirectory });
+  const templates = globSync('04-templates/**/*.component.yml', { cwd: baseComponentDirectory });
+  const componentFiles = [
+    ...atoms,
+    ...molecules,
+    ...organisms,
+    ...templates,
+  ];
+  return componentFiles.map((componentFile) => dirname(componentFile))
+}
 
-const fileList = [
-  ...atoms,
-  ...molecules,
-  ...organisms,
-  ...templates,
-];
+/**
+ * Get component directory.
+ *
+ * @param {string} componentDirectory - file path to component directory.
+ * @return {*}
+ */
+function getComponentName(componentDirectory) {
+  return componentDirectory.split('/').pop();
+}
 
-fileList.forEach(filePath => {
-  filePath = filePath.replace(/\.yml$/, '.scss');
-  const separator = filePath.lastIndexOf('/') + 1;
-  const styleDir = filePath.substring(0, separator);
-  const styleName = filePath.substring(separator, filePath.lastIndexOf('.'));
+/**
+ * Gets the SASS file for a component.
+ *
+ * @param {string} componentDirectory - directory of the component.
+ * @param {string} basePath - file path to components.
+ * @return {string|null}
+ *   SASS file path.
+ */
+function getComponentStylesFilePath(componentDirectory, basePath) {
+  const componentName = getComponentName(componentDirectory);
+  const fileName = `${componentDirectory}/${componentName}.scss`;
+  if (fs.existsSync(basePath + fileName)) {
+    return fileName;
+  }
+  return null;
+}
 
-  // Create a sass header to import base mixins.
-  const styleData = `
-    @import '00-base/variables';
-    ${
-      mixins.map(path => `@import '${path}';`).join('\n')
+// Create a sass header to import base mixins.
+export function generateComponentCssFiles(isBaseTheme) {
+  const componentBaseDirectory = getComponentDirectory(isBaseTheme);
+  const mixins = globSync('00-base/mixins/**/*.scss', { cwd: componentBaseDirectory });
+  const mixinsImport = mixins.map((path) => `@import '${path}';`).join('\n');
+  const components = getSingleDirectoryComponents(componentBaseDirectory);
+  components.forEach((componentDirectory) => {
+    const componentName = getComponentName(componentDirectory);
+    const styleFile = getComponentStylesFilePath(componentDirectory, componentBaseDirectory);
+    if (styleFile === null) {
+      console.log(`No SCSS file found for ${componentDirectory}`);
+      return;
     }
-    @import '${filePath}';
+    const styleData = `
+    @import '00-base/variables';
+    ${mixinsImport}
+    @import '${styleFile}';
   `;
+    // Compile SCSS.
+    const result = compileString(styleData, { loadPaths: [componentBaseDirectory] });
 
-  // Compile SCSS.
-  const result = compileString(styleData, { loadPaths: [fullComponentDir] });
+    // Write to directory.
+    const fileName = `${componentBaseDirectory}${componentDirectory}/${componentName}.css`;
+    fs.writeFileSync(fileName, cssHeader + result.css);
+    console.log(`Updating css file: ${fileName}`);
+  });
+}
 
-  // Write to directory.
-  console.log(`Writing css file: ${baseOutDir}${styleDir}${styleName}.css`);
-  fs.mkdirSync(`${baseOutDir}${styleDir}`, { recursive: true });
-  fs.writeFileSync(`${baseOutDir}${styleDir}${styleName}.css`, cssHeader + result.css);
-});
+/**
+ * Removes sass imports of components.
+ *
+ * @param {string} stylecss - previously cocatenated styles.
+ *
+ * @param {string} componentBaseDirectory - path to base directory of components.
+ *
+ * @return {string} modified sass imports.
+ */
+export function removeComponentSassImports(stylecss, componentBaseDirectory) {
+  const componentDirectories = getSingleDirectoryComponents(componentBaseDirectory);
+  const lines = stylecss.split('\n');
+  lines.filter((style) => {
+    if (!style.startsWith('@import')) {
+      return true;
+    }
+    const importPath = style.replace('@import', '').replace("'", '').replace('"','').trim()
+    const stylePath = dirname(`${componentBaseDirectory}/${importPath}`).replace(`${componentBaseDirectory}/`, '');
+    if (componentDirectories.includes(stylePath)) {
+      console.log(`Found component directory in import ${stylePath}`);
+      return false;
+    }
+    return true;
+  })
+  return lines.join('\n');
+}

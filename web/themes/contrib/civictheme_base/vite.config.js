@@ -11,6 +11,7 @@ export default defineConfig(({ mode }) => ({
         'molecules': resolve(import.meta.dirname, './components/02-molecules'),
         'organisms': resolve(import.meta.dirname, './components/03-organisms'),
         'templates': resolve(import.meta.dirname, './components/04-templates'),
+        'civictheme_base': resolve(import.meta.dirname, './components'),
       },
     }),
     // This plugin allow watching files in the ./dist folder.

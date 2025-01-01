@@ -1,5 +1,8 @@
 // phpcs:ignoreFile
 import Component from './button.twig';
+import './button.css';
+// eslint-disable-next-line import/extensions
+import './button.js';
 
 const meta = {
   title: 'Atoms/Form Controls/Button',

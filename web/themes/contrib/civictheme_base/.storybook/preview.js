@@ -1,3 +1,4 @@
+import '../dist/base.css'; // eslint-disable-line import/no-unresolved
 import '../dist/civictheme.css'; // eslint-disable-line import/no-unresolved
 import '../dist/civictheme'; // eslint-disable-line import/no-unresolved, import/extensions
 
