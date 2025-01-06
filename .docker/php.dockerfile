@@ -12,6 +12,9 @@ FROM ${CLI_IMAGE:-cli} as cli
 # @see https://github.com/uselagoon/lagoon-images/tree/main/images/php-fpm
 FROM uselagoon/php-8.3-fpm:24.10.0
 
+# @todo fix this for development servers and production
+RUN cp "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
+
 RUN apk add --no-cache tzdata
 
 COPY --from=cli /app /app

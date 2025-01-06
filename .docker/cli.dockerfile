@@ -50,13 +50,14 @@ RUN apk update \
     && rm -rf /var/cache/apk/*
 
 # Install updated version of NPM.
-RUN npm install -g npm@^8.6 && fix-permissions /home/.npm
+RUN npm install -g npm@^10.8 && fix-permissions /home/.npm
 
 # Adding patches and scripts.
 COPY patches /app/patches
 COPY scripts /app/scripts
 
 RUN mkdir -p web/themes/contrib/civictheme \
+    && mkdir -p web/themes/contrib/civictheme_base \
     && mkdir -p web/modules/custom/civictheme_govcms \
     && mkdir -p web/modules/custom/civictheme_admin \
     && mkdir -p web/modules/custom/civictheme_content \
@@ -73,6 +74,7 @@ RUN mkdir -p web/themes/contrib/civictheme \
 COPY composer.json composer.* .env* auth* /app/
 
 COPY web/themes/contrib/civictheme/composer.json /app/web/themes/contrib/civictheme/
+COPY web/themes/contrib/civictheme_base/composer.json /app/web/themes/contrib/civictheme_base/
 COPY web/modules/custom/civictheme_govcms/composer.json web/modules/custom/civictheme_govcms/
 COPY web/modules/custom/civictheme_admin/composer.json web/modules/custom/civictheme_admin/
 COPY web/modules/custom/civictheme_content/composer.json web/modules/custom/civictheme_content/
@@ -87,9 +89,11 @@ RUN if [ -n "${GITHUB_TOKEN}" ]; then export COMPOSER_AUTH="{\"github-oauth\": {
 
 # Install NodeJS dependencies.
 COPY web/themes/contrib/civictheme/ web/themes/contrib/civictheme/package* /app/web/themes/contrib/civictheme/
+COPY web/themes/contrib/civictheme_base/ web/themes/contrib/civictheme_base/package* /app/web/themes/contrib/civictheme_base/
 
 # Install NodeJS dependencies.
 RUN npm --prefix web/themes/contrib/civictheme install --no-audit --no-progress --unsafe-perm
+RUN npm --prefix web/themes/contrib/civictheme_base install --no-audit --no-progress --unsafe-perm
 
 # Copy all files into appllication source directory. Existing files are always
 # overridden.
@@ -97,12 +101,14 @@ COPY . /app
 
 # Compile front-end assets. Running this after copying all files as we need
 # sources to compile assets.
-RUN cd /app/web/themes/contrib/civictheme && npm run build
+# Install NodeJS dependencies.
+RUN cd /app/web/themes/contrib/civictheme_base && npm run dist
 
 # Create sub-theme.
 RUN cd /app/web/themes/contrib/civictheme \
   && php civictheme_create_subtheme.php civictheme_demo "CivicTheme Demo" "Demo sub-theme for a CivicTheme theme." --remove-examples
 
+
 # Compile sub-theme assets.
 RUN npm --prefix web/themes/custom/civictheme_demo install --no-audit --no-progress --unsafe-perm \
-  && cd /app/web/themes/custom/civictheme_demo && npm run build
+  && cd /app/web/themes/custom/civictheme_demo && npm run dist

@@ -67,7 +67,7 @@ final class CivicthemeStylesheetGenerator implements ContainerInjectionInterface
    * @return string
    *   Generated stylesheet URI.
    */
-  public function generate(array $variables, array $parent_selectors = ['html'], string $prefix = ''): string {
+  public function generate(array $variables, array $parent_selectors = ['html'], string $prefix = ''): ?string {
     $filepath = $this->getStylesheetUri();
     if (is_file($filepath) && file_exists($filepath)) {
       return $filepath;
@@ -169,13 +169,13 @@ final class CivicthemeStylesheetGenerator implements ContainerInjectionInterface
    * @return string|null
    *   Path to saved stylesheet or NULL if unable to save.
    */
-  protected function saveStylesheet($data): ?string {
+  protected function saveStylesheet($data): string {
     $filepath = $this->getStylesheetUri();
     try {
       $this->fileSystem->saveData($data, $filepath, FileExists::Replace);
       $this->fileSystem->chmod($filepath);
     }
-    catch (\Exception) {
+    catch (\Exception $exception) {
       // Drupal\Core\File\FileSystem handles logging, so simply handle the
       // exception and assign NULL.
       $filepath = NULL;

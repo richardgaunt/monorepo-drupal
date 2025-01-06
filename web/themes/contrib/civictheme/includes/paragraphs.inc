@@ -22,6 +22,10 @@ function _civictheme_preprocess_paragraph__paragraph_field__background(array &$v
   $variables['with_background'] = civictheme_get_field_value($variables['paragraph'], 'field_c_p_background');
 }
 
+function _civictheme_preprocess_paragraph__paragraph_field__is_contained(array &$variables): void {
+  $variables['is_contained'] = civictheme_get_field_value($variables['paragraph'], 'field_c_p_is_contained');
+}
+
 /**
  * Pre-process for Column count paragraph field.
  */
